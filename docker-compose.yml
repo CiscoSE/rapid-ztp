@@ -1,0 +1,30 @@
+# Rapid ZTP App | Development Stack
+version: '2'
+
+services:
+
+  web:
+    build: ./app/
+    image: rapid-ztp-app:dev
+    depends_on:
+      - mongo
+    environment:
+      PORT: 8000
+      MONGO_URL: mongodb://mongo:27017/
+    volumes:
+      - ./app/:/app/
+    ports:
+      - "80:8000"
+    command: pipenv run python -m ztp.web
+
+  mongo:
+    image: mongo:4
+    ports:
+      - "27017:27017"
+
+  mongo-express:
+    image: mongo-express:latest
+    depends_on:
+      - mongo
+    ports:
+      - "8081:8081"
