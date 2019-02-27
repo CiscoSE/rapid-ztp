@@ -1,0 +1,12 @@
+# Ignore Everything
+**
+
+
+# Include Only What Is Needed
+
+!Dockerfile
+
+!Pipfile
+!Pipfile.lock
+
+!ztp
