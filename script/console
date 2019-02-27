@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# Connect to the application's consoles.
+#
+# Copyright (c) 2019 Cisco and/or its affiliates.
+#
+# This software is licensed to you under the terms of the Cisco Sample
+# Code License, Version 1.0 (the "License"). You may obtain a copy of the
+# License at
+#
+#                https://developer.cisco.com/docs/licenses
+#
+# All use of the material herein must be in accordance with the terms of
+# the License. All rights not expressly granted by the License are
+# reserved. Unless required by applicable law or agreed to separately in
+# writing, software distributed under the License is distributed on an "AS
+# IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+# or implied.
+#
+# AUTHOR(s): Chris Lunsford <chrlunsf@cisco.com>
+
+
+set -e
+cd "$(dirname "$0")/.."
+
+
+# Default console
+console=python
+
+
+# Process Script Arguments
+for i in ${@}; do
+    case ${i} in
+        python)
+        console=python
+        ;;
+
+        web)
+        console=web
+        ;;
+
+        mongo)
+        console=mongo
+        ;;
+    esac
+done
+
+
+
+# Access the environment's console
+case ${console} in
+    python)
+    echo "==> Creating an ephemeral base Python container and connecting to the console"
+    docker run --rm -it -v $(pwd)/app/:/app/ rapid-ztp-app:dev /bin/bash
+    ;;
+
+    web)
+    echo "==> Connecting to the dev|web container console"
+    docker exec -it rapid-ztp_web_1 /bin/bash
+    ;;
+
+    mongo)
+    echo "==> Connecting to the dev|mongo container console"
+    docker exec -it rapid-ztp_mongo_1 /bin/bash
+    ;;
+
+esac
