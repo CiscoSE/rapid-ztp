@@ -1,0 +1,2 @@
+# Ignore development environment (root) Pipfile.lock
+/Pipfile.lock
