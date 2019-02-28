@@ -8,6 +8,7 @@ verify_ssl = true
 [packages]
 responder = "*"
 mongoengine = "*"
+blinker = "*"
 
 [requires]
 python_version = "3.6"

@@ -11,6 +11,7 @@ requests = "*"
 ipython = "*"
 
 [packages]
+blinker = "*"
 
 [requires]
 python_version = "3.7"
