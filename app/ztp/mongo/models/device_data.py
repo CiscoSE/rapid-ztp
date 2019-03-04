@@ -22,8 +22,6 @@ from mongoengine import (
     DateTimeField, DictField, DynamicDocument, StringField, signals,
 )
 
-from ztp.mongo.models.template import Template
-
 
 class DeviceData(DynamicDocument):
     """Device data document."""
@@ -42,7 +40,7 @@ class DeviceData(DynamicDocument):
     @classmethod
     def pre_save(cls, sender, document, **kwargs):
         """Update the device data attributes before saving the document."""
-        assert isinstance(document, Template)
+        assert isinstance(document, DeviceData)
         document.updated = datetime.utcnow()
 
 
