@@ -10,6 +10,7 @@ services:
       - mongo
     environment:
       PORT: 8000
+      RESPONDER_DEBUG: ${RESPONDER_DEBUG}
       MONGO_URL: mongodb://mongo:27017/
     volumes:
       - ./app/:/app/

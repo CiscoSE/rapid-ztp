@@ -1,4 +1,4 @@
-"""App default and imported configurations.
+"""Web service launcher.
 
 Copyright (c) 2019 Cisco and/or its affiliates.
 
@@ -16,17 +16,13 @@ IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 or implied.
 """
 
-import os
+import ztp.web
+from ztp.config import RESPONDER_ADDRESS, RESPONDER_DEBUG, RESPONDER_PORT
 
 
-# Responder
-RESPONDER_ADDRESS = os.environ.get("RESPONDER_ADDRESS", "0.0.0.0")
-RESPONDER_PORT = os.environ.get("PORT") \
-                 or os.environ.get("RESPONDER_PORT") \
-                 or 8000
-RESPONDER_DEBUG = os.environ.get("RESPONDER_DEBUG", "false").lower() == "true"
-
-
-# MondoDB
-MONGO_DATABASE = "ztp"
-MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+if __name__ == "__main__":
+    ztp.web.api.run(
+        address=RESPONDER_ADDRESS,
+        port=RESPONDER_PORT,
+        debug=RESPONDER_DEBUG,
+    )

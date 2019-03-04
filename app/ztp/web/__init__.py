@@ -1,4 +1,4 @@
-"""App default and imported configurations.
+"""Web service.
 
 Copyright (c) 2019 Cisco and/or its affiliates.
 
@@ -16,17 +16,26 @@ IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 or implied.
 """
 
-import os
+from pathlib import Path
+
+import responder
+
+here = Path(__file__).parent
+static_dir = here/"static"
+templates_dir = here/"templates"
+
+api = responder.API(
+    static_dir=str(static_dir),
+    static_route="/static",
+    templates_dir=str(templates_dir),
+    title="Rapid Zero-Touch Provisioning (ZTP) App",
+    version="0.1",
+    openapi="3.0.0",
+    docs_route="/api",
+)
 
 
-# Responder
-RESPONDER_ADDRESS = os.environ.get("RESPONDER_ADDRESS", "0.0.0.0")
-RESPONDER_PORT = os.environ.get("PORT") \
-                 or os.environ.get("RESPONDER_PORT") \
-                 or 8000
-RESPONDER_DEBUG = os.environ.get("RESPONDER_DEBUG", "false").lower() == "true"
-
-
-# MondoDB
-MONGO_DATABASE = "ztp"
-MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+# Import Views
+import ztp.web.views.api.device_data    # noqa
+import ztp.web.views.api.templates      # noqa
+import ztp.web.views.config             # noqa
