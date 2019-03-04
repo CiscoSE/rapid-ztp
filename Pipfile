@@ -6,9 +6,11 @@ verify_ssl = true
 [dev-packages]
 responder = "*"
 mongoengine = "*"
+marshmallow = {ref = "3.0.0rc4", git = "https://github.com/marshmallow-code/marshmallow.git"}
 click = "*"
 requests = "*"
 ipython = "*"
+regex = "*"
 
 [packages]
 blinker = "*"

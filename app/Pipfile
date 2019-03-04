@@ -4,11 +4,14 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+ipython = "*"
 
 [packages]
 responder = "*"
+marshmallow = {editable = true,ref = "3.0.0rc4",git = "https://github.com/marshmallow-code/marshmallow.git"}
 mongoengine = "*"
 blinker = "*"
+regex = "*"
 
 [requires]
 python_version = "3.6"
