@@ -68,7 +68,7 @@ class DeviceDataCollectionResource(object):
                                 $ref: "#/components/schemas/DeviceData"
 
     post:
-        summary: Upload and Replace all Device Data Records
+        summary: Replace ALL Device Data Records
         description: >
             Clear all existing device data records and replace with the
             uploaded device data.
@@ -138,8 +138,8 @@ class DeviceDataResource(object):
 
     ---
     get:
-        summary: Device Data
-        description: Get device data.
+        summary: Get Device Data
+        description: Get device data, by device serial number.
         tags:
             - Device Data
         parameters:
@@ -175,7 +175,7 @@ class DeviceDataResource(object):
                             type: string
 
     post:
-        summary: New Device Data
+        summary: Create Device Data
         description: Create a new device data record.
         tags:
             - Device Data
@@ -258,11 +258,44 @@ class DeviceDataResource(object):
                     properties:
                         error:
                             type: string
+
+    delete:
+        summary: Delete Device Data
+        description: Delete a device data record, by device serial number.
+        tags:
+            - Device Data
+        parameters:
+        - in: path
+          name: serial_number
+          description: Device serial number.
+          schema:
+            type: string
+        responses:
+            204:
+                description: No Content
+            404:
+                description: Not Found
+                schema:
+                    type: object
+                    required:
+                        - error
+                    properties:
+                        error:
+                            type: string
+            500:
+                description: Internal Server Error
+                schema:
+                    type: object
+                    required:
+                        - error
+                    properties:
+                        error:
+                            type: string
     """
 
     @staticmethod
     def on_get(req: Request, resp: Response, *, serial_number: str):
-        """Get device data."""
+        """Get device data, by device serial number."""
         try:
             device_data_object = DeviceData.objects.get(
                 serial_number=serial_number
@@ -305,7 +338,7 @@ class DeviceDataResource(object):
             }
 
         else:
-            resp.media = schema.dump(device_data_object)
+            resp.media = schema.dump(device_data_object)[0]
 
     @staticmethod
     async def on_put(req: Request, resp: Response, *, serial_number: str):
@@ -315,10 +348,11 @@ class DeviceDataResource(object):
             assert isinstance(data, dict)
 
             device_data_object = DeviceData.objects.get(
-                serial_number=serial_number
+                serial_number=serial_number,
             )
-            device_data_object.template_name = data.get("template_name")
-            device_data_object.config_data = data.get("config_data")
+
+            for attribute, value in data.items():
+                setattr(device_data_object, attribute, value)
             device_data_object.save()
             device_data_object.reload()
 
@@ -338,3 +372,23 @@ class DeviceDataResource(object):
         else:
             schema = DeviceDataSchema()
             resp.media = schema.dump(device_data_object)[0]
+
+    @staticmethod
+    def on_delete(req: Request, resp: Response, *, serial_number: str):
+        """Delete a device data record, by device serial number."""
+        try:
+            device_data_object = DeviceData.objects.get(
+                serial_number=serial_number
+            )
+
+        except mongoengine.DoesNotExist:
+            resp.status_code = api.status_codes.HTTP_404
+
+        except mongoengine.MultipleObjectsReturned as error:
+            logger.error(error)
+            resp.status_code = api.status_codes.HTTP_500
+            resp.media = {"error": str(error)}
+
+        else:
+            device_data_object.delete()
+            resp.status_code = api.status_codes.HTTP_204
