@@ -20,6 +20,7 @@ from pathlib import Path
 
 import responder
 
+
 here = Path(__file__).parent
 static_dir = here/"static"
 templates_dir = here/"templates"
