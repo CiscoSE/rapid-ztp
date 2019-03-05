@@ -17,16 +17,14 @@ or implied.
 """
 
 import logging
-import json
 
-from marshmallow import Schema, fields, post_load
+import jinja2
 import mongoengine
 from responder import Request, Response
 
 from ztp.mongo.models.device_data import DeviceData
-from ztp.web import api
 from ztp.template_engine import get_template
-import jinja2
+from ztp.web import api
 
 
 logger = logging.getLogger(__name__)
