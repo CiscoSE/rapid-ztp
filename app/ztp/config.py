@@ -19,10 +19,16 @@ or implied.
 import os
 
 
+# Logging
+_log_levels = {"CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"}
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "").upper() \
+    if os.environ.get("LOG_LEVEL", "").upper() in _log_levels else "WARNING"
+
+
 # Responder
 RESPONDER_ADDRESS = os.environ.get("RESPONDER_ADDRESS", "0.0.0.0")
-RESPONDER_PORT = os.environ.get("PORT") \
-                 or os.environ.get("RESPONDER_PORT") \
+RESPONDER_PORT = int(os.environ.get("PORT")) \
+                 or int(os.environ.get("RESPONDER_PORT")) \
                  or 8000
 RESPONDER_DEBUG = os.environ.get("RESPONDER_DEBUG", "false").lower() == "true"
 
