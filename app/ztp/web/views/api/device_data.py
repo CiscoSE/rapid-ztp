@@ -53,8 +53,8 @@ class DeviceDataCollectionResource(object):
 
     ---
     get:
-        summary: List Device-Data Records
-        description: List all device-data records.
+        summary: List Device Data Records
+        description: List all device data records.
         tags:
             - Device Data
         responses:
@@ -68,9 +68,10 @@ class DeviceDataCollectionResource(object):
                                 $ref: "#/components/schemas/DeviceData"
 
     post:
-        summary: Replace Device-Data Collection
+        summary: Upload and Replace all Device Data Records
         description: >
-            Replace the current contents of the device-data collection.
+            Clear all existing device data records and replace with the
+            uploaded device data.
         tags:
             - Device Data
         requestBody:
@@ -103,7 +104,7 @@ class DeviceDataCollectionResource(object):
 
     @staticmethod
     def on_get(req: Request, resp: Response):
-        """List all device-data records."""
+        """List all device data records."""
         device_data_objects = list(DeviceData.objects())
         schema = DeviceDataSchema(many=True)
         data = list(schema.dump(device_data_objects)[0])
@@ -111,7 +112,7 @@ class DeviceDataCollectionResource(object):
 
     @staticmethod
     async def on_post(req: Request, resp: Response):
-        """Replace device-data collection."""
+        """Replace device data collection."""
         try:
             data = await req.media()
             schema = DeviceDataSchema(many=True)
@@ -128,5 +129,212 @@ class DeviceDataCollectionResource(object):
             DeviceData.drop_collection()
             for device_data_object in device_data_objects:
                 device_data_object.save()
-            resp.status_code = 200
             resp.media = schema.dump(device_data_objects)[0]
+
+
+@api.route("/api/device_data/{serial_number}")
+class DeviceDataResource(object):
+    """API endpoint for device-level data operations.
+
+    ---
+    get:
+        summary: Device Data
+        description: Get device data.
+        tags:
+            - Device Data
+        parameters:
+        - in: path
+          name: serial_number
+          description: Device serial number.
+          schema:
+            type: string
+        responses:
+            200:
+                description: OK
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/DeviceData"
+            404:
+                description: Not Found
+                schema:
+                    type: object
+                    required:
+                        - error
+                    properties:
+                        error:
+                            type: string
+            500:
+                description: Internal Server Error
+                schema:
+                    type: object
+                    required:
+                        - error
+                    properties:
+                        error:
+                            type: string
+
+    post:
+        summary: New Device Data
+        description: Create a new device data record.
+        tags:
+            - Device Data
+        parameters:
+        - in: path
+          name: serial_number
+          description: Device serial number.
+          schema:
+            type: string
+        requestBody:
+            description: Device data record.
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/DeviceData"
+        responses:
+            200:
+                description: OK
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/DeviceData"
+            500:
+                description: Internal Server Error
+                schema:
+                    type: object
+                    required:
+                        - error
+                    properties:
+                        error:
+                            type: string
+    put:
+        summary: Update Device Data
+        description: Update a device data record.
+        tags:
+            - Device Data
+        parameters:
+        - in: path
+          name: serial_number
+          description: Device serial number.
+          schema:
+            type: string
+        requestBody:
+            description: Device data record.
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/DeviceData"
+        responses:
+            200:
+                description: OK
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/DeviceData"
+            400:
+                description: Bad Request
+                schema:
+                    type: object
+                    required:
+                        - error
+                    properties:
+                        error:
+                            type: string
+            404:
+                description: Not Found
+                schema:
+                    type: object
+                    required:
+                        - error
+                    properties:
+                        error:
+                            type: string
+            500:
+                description: Internal Server Error
+                schema:
+                    type: object
+                    required:
+                        - error
+                    properties:
+                        error:
+                            type: string
+    """
+
+    @staticmethod
+    def on_get(req: Request, resp: Response, *, serial_number: str):
+        """Get device data."""
+        try:
+            device_data_object = DeviceData.objects.get(
+                serial_number=serial_number
+            )
+
+        except mongoengine.DoesNotExist:
+            resp.status_code = api.status_codes.HTTP_404
+
+        except mongoengine.MultipleObjectsReturned as error:
+            logger.error(error)
+            resp.status_code = api.status_codes.HTTP_500
+            resp.media = {"error": str(error)}
+
+        else:
+            schema = DeviceDataSchema()
+            resp.media = schema.dump(device_data_object)[0]
+
+    @staticmethod
+    async def on_post(req: Request, resp: Response, *, serial_number: str):
+        """Create a new device data record."""
+        try:
+            data = await req.media()
+            schema = DeviceDataSchema()
+            device_data_object = schema.load(data)[0]
+            device_data_object.serial_number = serial_number
+            device_data_object.save()
+
+        except (json.JSONDecodeError, mongoengine.ValidationError) as error:
+            logger.error(error)
+            resp.status_code = api.status_codes.HTTP_400
+            resp.media = {"error": str(error)}
+
+        except mongoengine.NotUniqueError as error:
+            logger.error(error)
+            resp.status_code = api.status_codes.HTTP_400
+            resp.media = {
+                "error": f"Device data has already been uploaded for "
+                         f"{serial_number}. Please use the PUT HTTP method to "
+                         f"update this record."
+            }
+
+        else:
+            resp.media = schema.dump(device_data_object)
+
+    @staticmethod
+    async def on_put(req: Request, resp: Response, *, serial_number: str):
+        """Update a device data record."""
+        try:
+            data = await req.media()
+            assert isinstance(data, dict)
+
+            device_data_object = DeviceData.objects.get(
+                serial_number=serial_number
+            )
+            device_data_object.template_name = data.get("template_name")
+            device_data_object.config_data = data.get("config_data")
+            device_data_object.save()
+            device_data_object.reload()
+
+        except (json.JSONDecodeError, mongoengine.ValidationError) as error:
+            logger.error(error)
+            resp.status_code = api.status_codes.HTTP_400
+            resp.media = {"error": str(error)}
+
+        except mongoengine.DoesNotExist:
+            resp.status_code = api.status_codes.HTTP_404
+
+        except mongoengine.MultipleObjectsReturned as error:
+            logger.error(error)
+            resp.status_code = api.status_codes.HTTP_500
+            resp.media = {"error": str(error)}
+
+        else:
+            schema = DeviceDataSchema()
+            resp.media = schema.dump(device_data_object)[0]
