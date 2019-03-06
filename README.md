@@ -2,6 +2,8 @@
 
 *Rapid Zero-Touch Provisioning (ZTP) - Quickly deploy Cisco IOS devices*
 
+***This project is under early Alpha development and isn't quite ready for primetime yet.  Tread cautiously!***
+
 ---
 
 Cisco IOS configurations are readily template-able.  All you need is a powerful and intuitive templating system (thank you [Jinja](http://jinja.pocoo.org/)!) and a flexible data store for storing the data you want merged into your templates (hello [MongoDB](https://www.mongodb.com/)).  Combining the two with Cisco's [Zero-Touch Provisioning](https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/prog/configuration/166/b_166_programmability_cg/zero_touch_provisioning.html) model gives you a powerfuly simple configuration engine that generates and deploys Cisco IOS configurations on-demand.
