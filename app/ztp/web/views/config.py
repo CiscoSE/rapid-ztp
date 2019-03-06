@@ -101,6 +101,7 @@ class ConfigurationTemplateEngineResource(object):
             resp.media = {"error": str(error)}
 
         else:
-            resp.media = template.render(
+            resp.content = template.render(
                 config_data=device_data_object.config_data
-            )
+            ).encode("utf-8")
+            resp.headers["Content-Type"] = "text/plain; encoding=utf-8"

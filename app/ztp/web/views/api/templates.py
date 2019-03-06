@@ -126,15 +126,15 @@ class TemplatesResource(object):
           schema:
             type: string
         requestBody:
-            description: A Jinja2 template (UTF-8 text file).
+            description: A Jinja2 formatted template file.
             content:
-                application/json:
-                    schema:
-                        $ref: "#/components/schemas/Template"
-                text/plain:
+                application/octet-stream:
                     schema:
                         type: string
-                        example: "hostname {{config_data.hostname}}"
+                        format: binary
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Template"
         responses:
             200:
                 description: OK
@@ -204,8 +204,9 @@ class TemplatesResource(object):
             resp.media = {"error": str(error)}
 
         else:
-            if req.headers["Accept"] == "text/plain":
-                resp.media = template_object.template
+            if req.accepts("text/plain"):
+                resp.content = template_object.template.encode("utf-8")
+                resp.headers["Content-Type"] = "text/plain; encoding=utf-8"
             else:
                 schema = TemplateSchema()
                 resp.media = schema.dump(template_object)[0]
@@ -214,18 +215,13 @@ class TemplatesResource(object):
     async def on_post(req: Request, resp: Response, *, name: str):
         """Create a new template or update an existing template, by name."""
         try:
-            # Parse the post data
-            data = await req.media()
-            logger.critical(f"data = {data} {type(data)}")
-
-            # Extract the template text
-            if req.headers["Content-Type"] == "text/plain" and \
-                    isinstance(data, str):
-                template_text = data
-
-            else:
+            # Parse the post data and extract the template text
+            if req.headers["Content-Type"] == "application/json":
+                data = await req.media()
                 assert isinstance(data, dict) and data.get("template")
                 template_text = data["template"]
+            else:
+                template_text = await req.text
 
             # Get the template from MongoDB, if it exists, otherwise create a
             # new template object.
