@@ -24,6 +24,8 @@ cd "$(dirname "$0")/.."
 
 echo "==> Setting up / resetting project for initial use"
 
+pipenv install
+
 script/clean --deep
 
 script/build
