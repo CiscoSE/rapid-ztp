@@ -7,11 +7,10 @@ verify_ssl = true
 responder = "*"
 blinker = "*"
 mongoengine = "*"
-click = "*"
-requests = "*"
 ipython = "*"
 
 [packages]
+requests = "*"
 
 [requires]
 python_version = "3.7"
