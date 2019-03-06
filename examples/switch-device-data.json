@@ -1,0 +1,40 @@
+[
+  {
+    "serial_number": "1",
+    "template_name": "switch-template",
+    "config_data": {
+      "hostname": "switch1",
+      "management_interface": {
+        "name": "GigabitEthernet0/0",
+        "ip": "172.16.32.101",
+        "netmask": "255.255.255.0",
+        "default_gateway": "172.16.32.1"
+      },
+      "client_ports": {
+        "interface_range": "GigabitEthernet1/0/1 - 48 , GigabitEthernet2/0/1 - 48",
+        "data_vlan": 101,
+        "voice_vlan": 201
+      },
+      "uplink_ports": "TenGigabitEthernet1/1/1 - 8 , TenGigabitEthernet2/1/1 - 8"
+    }
+  },
+  {
+    "serial_number": "2",
+    "template_name": "switch-template",
+    "config_data": {
+      "hostname": "switch2",
+      "management_interface": {
+        "name": "GigabitEthernet0/0",
+        "ip": "172.16.32.102",
+        "netmask": "255.255.255.0",
+        "default_gateway": "172.16.32.1"
+      },
+      "client_ports": {
+        "interface_range": "GigabitEthernet1/0/1 - 48 , GigabitEthernet2/0/1 - 48",
+        "data_vlan": 102,
+        "voice_vlan": 202
+      },
+      "uplink_ports": "TenGigabitEthernet1/1/1 - 8 , TenGigabitEthernet2/1/1 - 8"
+    }
+  }
+]

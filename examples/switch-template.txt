@@ -1,0 +1,31 @@
+! Sample Switch Configuration Template - Demonstrating Jinja2 Templating
+! THIS EXAMPLE IS NOT COMPLETE NOR RECOMMENDED FOR PRODUCTION DEPLOYMENTS.
+! DO NOT USE FOR PRODUCTION DEPLOYMENTS.
+
+hostname {{config_data.hostname}}
+ip domain-name cisco.com
+
+! Management Interface Configuration
+interface {{config_data.management_interface.name}}
+ description Management Interface
+ ip address {{config_data.management_interface.ip}} {{config_data.management_interface.netmask}}
+ no shutdown
+
+
+! Interface Configurations
+interface range {{config_data.client_ports.interface_range}}
+ description Client Port
+ switchport trunk encapsulation dot1q
+ switchport access vlan {{config_data.client_ports.data_vlan}}
+ switchport access vlan {{config_data.client_ports.voice_vlan}}
+!
+interface range {{config_data.uplink_ports}}
+ description Uplink Port
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+
+
+! Default-Gateway Configuration
+ip default-gateway {{config_data.default_gateway}}
+
+end
