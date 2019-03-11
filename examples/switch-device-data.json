@@ -1,6 +1,6 @@
 [
   {
-    "serial_number": "1",
+    "serial_number": "D001",
     "template_name": "switch-template",
     "config_data": {
       "hostname": "switch1",
@@ -19,7 +19,7 @@
     }
   },
   {
-    "serial_number": "2",
+    "serial_number": "D002",
     "template_name": "switch-template",
     "config_data": {
       "hostname": "switch2",
@@ -30,11 +30,11 @@
         "default_gateway": "172.16.32.1"
       },
       "client_ports": {
-        "interface_range": "GigabitEthernet1/0/1 - 48 , GigabitEthernet2/0/1 - 48",
+        "interface_range": "GigabitEthernet1/0/1 - 48",
         "data_vlan": 102,
         "voice_vlan": 202
       },
-      "uplink_ports": "TenGigabitEthernet1/1/1 - 8 , TenGigabitEthernet2/1/1 - 8"
+      "uplink_ports": "TenGigabitEthernet1/1/1 - 8"
     }
   }
 ]
